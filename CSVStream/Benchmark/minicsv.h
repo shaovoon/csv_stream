@@ -486,7 +486,7 @@ mini::csv::ifstream& operator >> (mini::csv::ifstream& istm, T& val)
 	{
 		val = boost::lexical_cast<T>(str);
 	}
-	catch (boost::bad_lexical_cast& e)
+	catch (boost::bad_lexical_cast&)
 	{
 		throw std::runtime_error(istm.error_line(str, MY_FUNC_SIG).c_str());
 	}
@@ -899,7 +899,7 @@ mini::csv::istringstream& operator >> (mini::csv::istringstream& istm, T& val)
 	{
 		val = boost::lexical_cast<T>(str);
 	}
-	catch (boost::bad_lexical_cast& e)
+	catch (boost::bad_lexical_cast&)
 	{
 		throw std::runtime_error(istm.error_line(str, MY_FUNC_SIG).c_str());
 	}
