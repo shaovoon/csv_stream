@@ -223,3 +223,25 @@ Display Output
 Shampoo,200,15
 Towel,300,6
 ```
+
+### Change delimiter on the fly
+
+Delimiter can be changed on the fly on the input/output stream with `sep` class. The example has whitespace and commma as delimiter in the text.
+
+```cpp
+// demo sep class usage
+csv::istringstream is("vt 37.8,44.32,75.1");
+is.set_delimiter(' ', "$$");
+csv::sep space(' ', "<space>");
+csv::sep comma(',', "<comma>");
+while (is.read_line())
+{
+    std::string type;
+    float r = 0, b = 0, g = 0;
+    is >> space >> type >> comma >> r >> b >> g;
+    // display the read items
+    std::cout << type << "|" << r << "|" << b << "|" << g << std::endl;
+}
+```
+
+[CodeProject Tutorial](https://www.codeproject.com/Articles/1167806/Cplusplus-CSV-Stream-based-on-C-API)
