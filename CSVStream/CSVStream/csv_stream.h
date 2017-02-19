@@ -1,10 +1,11 @@
 // The MIT License (MIT)
 // capi Fast CSV Streams 0.5.0 Beta
-// Copyright (C) 2016, by Wong Shao Voon (shaovoon@yahoo.com)
+// Copyright (C) 2017, by Wong Shao Voon (shaovoon@yahoo.com)
 //
 // http://opensource.org/licenses/MIT
 //
 // version 0.5.0  : First Commit
+// version 0.5.1  : Fix Input Stream reading char exception
 
 #ifndef CSV_STREAMS_H
 	#define CSV_STREAMS_H
@@ -819,6 +820,20 @@ namespace capi
 		{
 			throw std::runtime_error(istm.error_line(src, MY_FUNC_SIG).c_str());
 		}
+
+		return istm;
+	}
+	
+	inline capi::csv::ifstream& operator >> (capi::csv::ifstream& istm, char& val)
+	{
+		const std::string& src = istm.get_delimited_str();
+
+		if (src.empty())
+		{
+			throw std::runtime_error(istm.error_line(src, MY_FUNC_SIG).c_str());
+		}
+
+		val = src[0];
 
 		return istm;
 	}
@@ -1688,6 +1703,20 @@ capi::csv::istringstream& operator >> (capi::csv::istringstream& istm, T& val)
 	return istm;
 }
 
+inline capi::csv::istringstream& operator >> (capi::csv::istringstream& istm, char& val)
+{
+	const std::string& src = istm.get_delimited_str();
+
+	if (src.empty())
+	{
+		throw std::runtime_error(istm.error_line(src, MY_FUNC_SIG).c_str());
+	}
+
+	val = src[0];
+
+	return istm;
+}
+
 inline capi::csv::istringstream& operator >> (capi::csv::istringstream& istm, std::string& val)
 {
 	val = istm.get_delimited_str();
@@ -1711,6 +1740,20 @@ capi::csv::icachedfstream& operator >> (capi::csv::icachedfstream& istm, T& val)
 	{
 		throw std::runtime_error(istm.error_line(src, MY_FUNC_SIG).c_str());
 	}
+
+	return istm;
+}
+
+inline capi::csv::icachedfstream& operator >> (capi::csv::icachedfstream& istm, char& val)
+{
+	const std::string& src = istm.get_delimited_str();
+
+	if (src.empty())
+	{
+		throw std::runtime_error(istm.error_line(src, MY_FUNC_SIG).c_str());
+	}
+
+	val = src[0];
 
 	return istm;
 }
