@@ -6,6 +6,7 @@
 //
 // version 0.5.0  : First Commit
 // version 0.5.1  : Fix Input Stream reading char exception
+// version 0.5.2  : Add NChar class and its unit tests. Remove CHAR_AS_ASCII macro.
 
 #ifndef CSV_STREAMS_H
 	#define CSV_STREAMS_H
@@ -31,6 +32,16 @@ namespace capi
 {
 	namespace csv
 	{
+		struct NChar
+		{
+			explicit NChar(char& ch_) : ch(ch_) {}
+			const char& getChar() const { return ch; }
+			char& getChar() { return ch; }
+			void setChar(char ch_) { ch = ch_; }
+		private:
+			char& ch;
+		};
+
 #ifdef USE_BOOST_SPIRIT_QI
 		template<typename string_type>
 		inline bool str_to_value(const string_type& src, double& dest)
@@ -252,7 +263,6 @@ namespace capi
 
 #endif
 
-#ifdef CHAR_AS_ASCII
 		template<typename string_type>
 		inline bool str_to_value(const string_type& src, char& dest)
 		{
@@ -263,9 +273,9 @@ namespace capi
 
 			return true;
 		}
-#else
+
 		template<typename string_type>
-		inline bool str_to_value(const string_type& src, char& dest)
+		inline bool str_to_value(const string_type& src, NChar& dest)
 		{
 			try
 			{
@@ -275,7 +285,8 @@ namespace capi
 				if (n < -128)
 					return false;
 
-				dest = static_cast<char>(n);
+				char temp = static_cast<char>(n);
+				dest.setChar(temp);
 			}
 			catch (std::invalid_argument&)
 			{
@@ -287,7 +298,6 @@ namespace capi
 			}
 			return true;
 		}
-#endif
 
 		template<typename string_type>
 		inline bool str_to_value(const string_type& src, unsigned char& dest)
@@ -823,7 +833,20 @@ namespace capi
 
 		return istm;
 	}
-	
+
+	inline capi::csv::ifstream& operator >> (capi::csv::ifstream& istm, capi::csv::NChar val)
+	{
+		const std::string& src = istm.get_delimited_str();
+
+		if (!capi::csv::str_to_value(src, val))
+		{
+			throw std::runtime_error(istm.error_line(src, MY_FUNC_SIG).c_str());
+		}
+
+		return istm;
+	}
+
+	template<>
 	inline capi::csv::ifstream& operator >> (capi::csv::ifstream& istm, char& val)
 	{
 		const std::string& src = istm.get_delimited_str();
@@ -838,6 +861,7 @@ namespace capi
 		return istm;
 	}
 
+	template<>
 	inline capi::csv::ifstream& operator >> (capi::csv::ifstream& istm, std::string& val)
 	{
 		val = istm.get_delimited_str();
@@ -845,6 +869,7 @@ namespace capi
 		return istm;
 	}
 
+	template<>
 	inline capi::csv::ifstream& operator >> (capi::csv::ifstream& istm, capi::csv::sep& val)
 	{
 		istm.set_delimiter(val.get_delimiter(), val.get_escape());
@@ -894,6 +919,19 @@ namespace capi
 		return ostm;
 	}
 
+	inline capi::csv::ofstream& operator << (capi::csv::ofstream& ostm, const capi::csv::NChar val)
+	{
+		if (!ostm.get_after_newline() && ostm.get_delimiter().size() > 0)
+			ostm.write_char(ostm.get_delimiter()[0]);
+
+		std::string temp = std::to_string((int)val.getChar());
+		ostm.escape_str_and_output(temp);
+
+		ostm.set_after_newline(false);
+
+		return ostm;
+	}
+
 	template<>
 	inline capi::csv::ofstream& operator << (capi::csv::ofstream& ostm, const capi::csv::sep& val)
 	{
@@ -916,10 +954,14 @@ namespace capi
 		}
 		else
 		{
+			if (!ostm.get_after_newline() && ostm.get_delimiter().size() > 0)
+				ostm.write_char(ostm.get_delimiter()[0]);
+
 			std::string temp = "";
 			temp += val;
+			ostm.escape_str_and_output(temp);
 
-			ostm.escape_and_output(temp);
+			ostm.set_after_newline(false);
 		}
 
 		return ostm;
@@ -1703,6 +1745,18 @@ capi::csv::istringstream& operator >> (capi::csv::istringstream& istm, T& val)
 	return istm;
 }
 
+inline capi::csv::istringstream& operator >> (capi::csv::istringstream& istm, capi::csv::NChar val)
+{
+	const std::string& src = istm.get_delimited_str();
+
+	if (!capi::csv::str_to_value(src, val))
+	{
+		throw std::runtime_error(istm.error_line(src, MY_FUNC_SIG).c_str());
+	}
+
+	return istm;
+}
+
 inline capi::csv::istringstream& operator >> (capi::csv::istringstream& istm, char& val)
 {
 	const std::string& src = istm.get_delimited_str();
@@ -1733,6 +1787,18 @@ inline capi::csv::istringstream& operator >> (capi::csv::istringstream& istm, ca
 
 template<typename T>
 capi::csv::icachedfstream& operator >> (capi::csv::icachedfstream& istm, T& val)
+{
+	const std::string& src = istm.get_delimited_str();
+
+	if (!capi::csv::str_to_value(src, val))
+	{
+		throw std::runtime_error(istm.error_line(src, MY_FUNC_SIG).c_str());
+	}
+
+	return istm;
+}
+
+inline capi::csv::icachedfstream& operator >> (capi::csv::icachedfstream& istm, capi::csv::NChar val)
 {
 	const std::string& src = istm.get_delimited_str();
 
@@ -1811,6 +1877,20 @@ inline capi::csv::ostringstream& operator << (capi::csv::ostringstream& ostm, co
 
 	return ostm;
 }
+
+inline capi::csv::ostringstream& operator << (capi::csv::ostringstream& ostm, const capi::csv::NChar val)
+{
+	if (!ostm.get_after_newline() && ostm.get_delimiter().size() > 0)
+		ostm.write_char(ostm.get_delimiter()[0]);
+
+	std::string temp = std::to_string((int)val.getChar());
+	ostm.escape_str_and_output(temp);
+
+	ostm.set_after_newline(false);
+
+	return ostm;
+}
+
 template<>
 inline capi::csv::ostringstream& operator << (capi::csv::ostringstream& ostm, const capi::csv::sep& val)
 {
@@ -1830,10 +1910,14 @@ inline capi::csv::ostringstream& operator << (capi::csv::ostringstream& ostm, co
 	}
 	else
 	{
+		if (!ostm.get_after_newline() && ostm.get_delimiter().size() > 0)
+			ostm.write_char(ostm.get_delimiter()[0]);
+
 		std::string temp = "";
 		temp += val;
+		ostm.escape_str_and_output(temp);
 
-		ostm.escape_and_output(temp);
+		ostm.set_after_newline(false);
 	}
 
 	return ostm;
@@ -1888,6 +1972,20 @@ inline capi::csv::ocachedfstream& operator << (capi::csv::ocachedfstream& ostm, 
 
 	return ostm;
 }
+
+inline capi::csv::ocachedfstream& operator << (capi::csv::ocachedfstream& ostm, const capi::csv::NChar val)
+{
+	if (!ostm.get_after_newline() && ostm.get_delimiter().size() > 0)
+		ostm.write_char(ostm.get_delimiter()[0]);
+
+	std::string temp = std::to_string((int)val.getChar());
+	ostm.escape_str_and_output(temp);
+
+	ostm.set_after_newline(false);
+
+	return ostm;
+}
+
 template<>
 inline capi::csv::ocachedfstream& operator << (capi::csv::ocachedfstream& ostm, const capi::csv::sep& val)
 {
@@ -1910,10 +2008,14 @@ inline capi::csv::ocachedfstream& operator << (capi::csv::ocachedfstream& ostm, 
 	}
 	else
 	{
+		if (!ostm.get_after_newline() && ostm.get_delimiter().size() > 0)
+			ostm.write_char(ostm.get_delimiter()[0]);
+
 		std::string temp = "";
 		temp += val;
+		ostm.escape_str_and_output(temp);
 
-		ostm.escape_and_output(temp);
+		ostm.set_after_newline(false);
 	}
 
 	return ostm;
