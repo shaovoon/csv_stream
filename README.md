@@ -244,4 +244,45 @@ while (is.read_line())
 }
 ```
 
+*Version 0.5.2* fixed some char output problems and added NChar (char wrapper) class to write to numeric value [-127..128] to char variables.
+
+```cpp
+bool test_nchar(bool enable_quote)
+{
+    csv::ostringstream os;
+    os.set_delimiter(',', "$$");
+    os.enable_surround_quote_on_str(enable_quote, '\"');
+
+    os << "Wallet" << 56 << NEWLINE;
+
+    csv::istringstream is(os.get_text().c_str());
+    is.set_delimiter(',', "$$");
+    is.enable_trim_quote_on_str(enable_quote, '\"');
+
+    while (is.read_line())
+    {
+        try
+        {
+            std::string dest_name = "";
+            char dest_char = 0;
+
+            is >> dest_name >> csv::NChar(dest_char);
+
+            std::cout << dest_name << ", " << (int)dest_char << std::endl;
+        }
+        catch (std::runtime_error& e)
+        {
+            std::cerr << __FUNCTION__ << e.what() << std::endl;
+        }
+    }
+    return true;
+}
+```
+
+Display Output
+
+```
+Wallet, 56
+```
+
 [CodeProject Tutorial](https://www.codeproject.com/Articles/1167806/Cplusplus-CSV-Stream-based-on-C-API)
