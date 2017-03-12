@@ -47,4 +47,6 @@ README.txt
 */ipch/
 */*/ipch/
 
-
+*.db-wal
+*.db-shm
+*.ipch
