@@ -244,7 +244,7 @@ while (is.read_line())
 }
 ```
 
-_Version 0.5.2_ fixed some char output problems and added NChar (char wrapper) class to write to numeric value [-127..128] to char variables.
+__Version 0.5.2__ fixed some char output problems and added NChar (char wrapper) class to write to numeric value [-127..128] to char variables.
 
 ```cpp
 bool test_nchar(bool enable_quote)
