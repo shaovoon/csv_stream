@@ -20,6 +20,10 @@
 	#include <boost/spirit/include/qi.hpp>
 #endif
 
+#ifdef USE_GOOGLE_DCONV
+	#include "double_conversion/double-conversion.h"
+#endif
+
 #define NEWLINE '\n'
 
 #ifdef _WIN32
@@ -107,6 +111,27 @@ namespace capi
 			return qi::parse(std::cbegin(src), std::cend(src), qi::ushort_, dest);
 		}
 #else
+#ifdef USE_GOOGLE_DCONV
+		template<typename string_type>
+		inline bool str_to_value(const string_type& src, double& dest)
+		{
+			StringToDoubleConverter conv(StringToDoubleConverter::NO_FLAGS, 0.0, NAN, "infinity", "nan");
+			int processed_characters_count = 0;
+			dest = conv.StringToDouble(src.c_str(), src.size(), &processed_characters_count);
+
+			return true;
+		}
+
+		template<typename string_type>
+		inline bool str_to_value(const string_type& src, float& dest)
+		{
+			StringToDoubleConverter conv(StringToDoubleConverter::NO_FLAGS, 0.0, NAN, "infinity", "nan");
+			int processed_characters_count = 0;
+			dest = conv.StringToFloat(src.c_str(), src.size(), &processed_characters_count);
+
+			return true;
+		}
+#else
 		template<typename string_type>
 		inline bool str_to_value(const string_type& src, double& dest)
 		{
@@ -142,7 +167,7 @@ namespace capi
 			}
 			return true;
 		}
-
+#endif
 		template<typename string_type>
 		inline bool str_to_value(const string_type& src, long long& dest)
 		{
