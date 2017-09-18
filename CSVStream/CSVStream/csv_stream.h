@@ -7,7 +7,7 @@
 // version 0.5.0  : First Commit
 // version 0.5.1  : Fix Input Stream reading char exception
 // version 0.5.2  : Add NChar class and its unit tests. Remove CHAR_AS_ASCII macro.
-// version 0.5.2  : Can have an unescaped delimiter which will be enclosed by quote automatically
+// version 0.5.3  : Can have an unescaped delimiter which will be enclosed by quote automatically
 
 #ifndef CSV_STREAMS_H
 	#define CSV_STREAMS_H
