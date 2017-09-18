@@ -7,6 +7,7 @@
 // version 0.5.0  : First Commit
 // version 0.5.1  : Fix Input Stream reading char exception
 // version 0.5.2  : Add NChar class and its unit tests. Remove CHAR_AS_ASCII macro.
+// version 0.5.2  : Can have an unescaped delimiter which will be enclosed by quote automatically
 
 #ifndef CSV_STREAMS_H
 	#define CSV_STREAMS_H
@@ -450,7 +451,7 @@ namespace capi
 
 				fread(tt, 3, 1, input_file_ptr);
 
-				if (tt[0] == (char)0xEF || tt[1] == (char)0xBB || tt[2] == (char)0xBF) // not the correct BOM, so reset the pos to beginning (file might not have BOM)
+				if (tt[0] == (char)0xEF && tt[1] == (char)0xBB && tt[2] == (char)0xBF) // not the correct BOM, so reset the pos to beginning (file might not have BOM)
 					has_bom = true;
 
 				fseek(input_file_ptr, 0, SEEK_SET);
@@ -585,7 +586,7 @@ namespace capi
 					}
 
 					ch = this->str[pos];
-					if (trim_quote_on_str)
+					//if (trim_quote_on_str)
 					{
 						if (within_quote&& ch == trim_quote && this->str[pos + 1] == trim_quote)
 						{
@@ -616,7 +617,7 @@ namespace capi
 			std::string& unescape(std::string & src)
 			{
 				src = unescape_str.empty() ? src : replace(src, unescape_str, delimiter);
-				if (trim_quote_on_str)
+				//if (trim_quote_on_str)
 				{
 					if (!src.empty() && (src[0] == trim_quote && src[src.size() - 1] == trim_quote))
 					{
@@ -636,7 +637,7 @@ namespace capi
 					return 0;
 
 				size_t cnt = 0;
-				if (trim_quote_on_str)
+				//if (trim_quote_on_str)
 				{
 					bool inside_quote = false;
 					for (size_t i = 0; i < str.size(); ++i)
@@ -650,10 +651,6 @@ namespace capi
 								++cnt;
 						}
 					}
-				}
-				else
-				{
-					cnt = std::count(str.begin(), str.end(), delimiter[0]);
 				}
 				return cnt;
 			}
@@ -809,7 +806,7 @@ namespace capi
 			void escape_str_and_output(std::string& src)
 			{
 				src = ((escape_str.empty()) ? src : replace(src, delimiter, escape_str));
-				if (surround_quote_on_str)
+				if (surround_quote_on_str || src.find(delimiter) != std::string::npos)
 				{
 					if (!quote_escape.empty())
 					{
@@ -1121,7 +1118,7 @@ namespace capi
 					}
 
 					ch = this->str[pos];
-					if (trim_quote_on_str)
+					//if (trim_quote_on_str)
 					{
 						if (within_quote&& ch == trim_quote && this->str[pos + 1] == trim_quote)
 						{
@@ -1154,7 +1151,7 @@ namespace capi
 			std::string& unescape(std::string & src)
 			{
 				src = unescape_str.empty() ? src : replace(src, unescape_str, delimiter);
-				if (trim_quote_on_str)
+				//if (trim_quote_on_str)
 				{
 					if (!src.empty() && (src[0] == trim_quote && src[src.size() - 1] == trim_quote))
 					{
@@ -1175,7 +1172,7 @@ namespace capi
 					return 0;
 
 				size_t cnt = 0;
-				if (trim_quote_on_str)
+				//if (trim_quote_on_str)
 				{
 					bool inside_quote = false;
 					for (size_t i = 0; i < str.size(); ++i)
@@ -1189,10 +1186,6 @@ namespace capi
 								++cnt;
 						}
 					}
-				}
-				else
-				{
-					cnt = std::count(str.begin(), str.end(), delimiter[0]);
 				}
 				return cnt;
 			}
@@ -1403,7 +1396,7 @@ namespace capi
 					}
 
 					ch = this->str[pos];
-					if (trim_quote_on_str)
+					//if (trim_quote_on_str)
 					{
 						if (within_quote&& ch == trim_quote && this->str[pos + 1] == trim_quote)
 						{
@@ -1436,7 +1429,7 @@ namespace capi
 			std::string& unescape(std::string & src)
 			{
 				src = unescape_str.empty() ? src : replace(src, unescape_str, delimiter);
-				if (trim_quote_on_str)
+				//if (trim_quote_on_str)
 				{
 					if (!src.empty() && (src[0] == trim_quote && src[src.size() - 1] == trim_quote))
 					{
@@ -1457,7 +1450,7 @@ namespace capi
 					return 0;
 
 				size_t cnt = 0;
-				if (trim_quote_on_str)
+				//if (trim_quote_on_str)
 				{
 					bool inside_quote = false;
 					for (size_t i = 0; i < str.size(); ++i)
@@ -1471,10 +1464,6 @@ namespace capi
 								++cnt;
 						}
 					}
-				}
-				else
-				{
-					cnt = std::count(str.begin(), str.end(), delimiter[0]);
 				}
 				return cnt;
 			}
@@ -1604,7 +1593,7 @@ namespace capi
 			void escape_str_and_output(std::string& src)
 			{
 				src = ((escape_str.empty()) ? src : replace(src, delimiter, escape_str));
-				if (surround_quote_on_str)
+				if (surround_quote_on_str || src.find(delimiter) != std::string::npos)
 				{
 					if (!quote_escape.empty())
 					{
@@ -1700,7 +1689,7 @@ namespace capi
 			void escape_str_and_output(std::string& src)
 			{
 				src = ((escape_str.empty()) ? src : replace(src, delimiter, escape_str));
-				if (surround_quote_on_str)
+				if (surround_quote_on_str || src.find(delimiter) != std::string::npos)
 				{
 					if (!quote_escape.empty())
 					{
