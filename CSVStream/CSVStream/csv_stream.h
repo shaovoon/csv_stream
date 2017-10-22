@@ -1005,22 +1005,20 @@ namespace capi
 		{
 		public:
 			istringstream(const char * text)
-				: input_str(text)
-				, input_str_index(0)
-				, str("")
-				, pos(0)
-				, delimiter(",")
-				, unescape_str("##")
-				, trim_quote_on_str(false)
-				, trim_quote('\"')
-				, trim_quote_str(1, trim_quote)
-				, terminate_on_blank_line(true)
-				, quote_unescape("&quot;")
-				, line_num(0)
-				, token_num(0)
 			{
+				set_new_input_string(text);
 			}
-			void reset(const char * text)
+			istringstream(const std::string& text)
+			{
+				set_new_input_string(text);
+			}
+
+			void set_new_input_string(const std::string& text)
+			{
+				reset(text);
+			}
+
+			void reset(const std::string& text)
 			{
 				input_str = text;
 				input_str_index = 0;
@@ -1536,14 +1534,8 @@ namespace capi
 		public:
 
 			ostringstream()
-				: output_str("")
-				, after_newline(true)
-				, delimiter(",")
-				, escape_str("##")
-				, surround_quote_on_str(false)
-				, surround_quote('\"')
-				, quote_escape("&quot;")
 			{
+				reset();
 			}
 			void reset()
 			{
@@ -1632,14 +1624,8 @@ namespace capi
 		public:
 
 			ocachedfstream()
-				: output_str("")
-				, after_newline(true)
-				, delimiter(",")
-				, escape_str("##")
-				, surround_quote_on_str(false)
-				, surround_quote('\"')
-				, quote_escape("&quot;")
 			{
+				reset();
 			}
 			void reset()
 			{
