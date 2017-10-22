@@ -88,7 +88,12 @@ Instantiation is slow because of many data members to initialize.
 using namespace capi;
 
 csv::ofstream os("products.txt");
-os.set_delimiter(',', "$$");
+// For version 0.5.3 and above, give empty string 
+// for the escape string(2nd parameter).
+// Text with comma delimiter will be 
+// enclosed with quotes to be
+// compatible with MS Excel CSV format.
+os.set_delimiter(',', "");
 os.enable_surround_quote_on_str(true, '\"');
 if (os.is_open())
 {
@@ -132,7 +137,12 @@ if (is.is_open())
 using namespace capi;
 
 csv::ocachedfstream os;
-os.set_delimiter(',', "$$");
+// For version 0.5.3 and above, give empty string 
+// for the escape string(2nd parameter).
+// Text with comma delimiter will be 
+// enclosed with quotes to be
+// compatible with MS Excel CSV format.
+os.set_delimiter(',', "");
 os.enable_surround_quote_on_str(true, '\"');
 if (os.is_open())
 {
@@ -175,7 +185,12 @@ if (is.is_open())
 using namespace capi;
 
 csv::ostringstream os;
-os.set_delimiter(',', "$$");
+// For version 0.5.3 and above, give empty string 
+// for the escape string(2nd parameter).
+// Text with comma delimiter will be 
+// enclosed with quotes to be
+// compatible with MS Excel CSV format.
+os.set_delimiter(',', "");
 os.enable_surround_quote_on_str(true, '\"');
 if (os.is_open())
 {
