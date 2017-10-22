@@ -28,6 +28,8 @@
 // version 1.8.1  : Put under the mini namespace
 // version 1.8.2  : Optimize input stream.
 // version 1.8.3  : Add unit test and enable to use 2 quotes to escape 1 quote
+// version 1.8.4  : Add NChar class and fix error of no delimiter written for char type.
+// version 1.8.5  : Can have an unescaped delimiter which will be enclosed by quote automatically
 
 //#define USE_BOOST_LEXICAL_CAST
 
@@ -57,6 +59,16 @@ namespace mini
 
 	namespace csv
 	{
+		struct NChar
+		{
+			explicit NChar(char& ch_) : ch(ch_) {}
+			const char& getChar() const { return ch; }
+			char& getChar() { return ch; }
+			void setChar(char ch_) { ch = ch_; }
+		private:
+			char& ch;
+		};
+
 		inline std::string const & replace(std::string & src, std::string const & to_find, std::string const & to_replace)
 		{
 			size_t pos = 0;
@@ -242,7 +254,7 @@ namespace mini
 					}
 
 					ch = this->str[pos];
-					if (trim_quote_on_str)
+					//if (trim_quote_on_str)
 					{
 						if (within_quote&& ch == trim_quote && this->str[pos + 1] == trim_quote)
 						{
@@ -275,7 +287,7 @@ namespace mini
 			{
 				src = unescape_str.empty() ? src : replace(src, unescape_str, delimiter);
 
-				if (trim_quote_on_str)
+				//if (trim_quote_on_str)
 				{
 					if (!src.empty() && (src[0] == trim_quote && src[src.size() - 1] == trim_quote))
 					{
@@ -296,7 +308,7 @@ namespace mini
 					return 0;
 
 				size_t cnt = 0;
-				if (trim_quote_on_str)
+				//if (trim_quote_on_str)
 				{
 					bool inside_quote = false;
 					for (size_t i = 0; i < str.size(); ++i)
@@ -310,10 +322,6 @@ namespace mini
 								++cnt;
 						}
 					}
-				}
-				else
-				{
-					cnt = std::count(str.begin(), str.end(), delimiter[0]);
 				}
 				return cnt;
 			}
@@ -449,7 +457,7 @@ namespace mini
 			void escape_str_and_output(std::string src)
 			{
 				src = ((escape_str.empty()) ? src : replace(src, delimiter, escape_str));
-				if (surround_quote_on_str)
+				if (surround_quote_on_str || src.find(delimiter) != std::string::npos)
 				{
 					if (!quote_escape.empty())
 					{
@@ -486,7 +494,7 @@ mini::csv::ifstream& operator >> (mini::csv::ifstream& istm, T& val)
 	{
 		val = boost::lexical_cast<T>(str);
 	}
-	catch (boost::bad_lexical_cast&)
+	catch (boost::bad_lexical_cast& e)
 	{
 		throw std::runtime_error(istm.error_line(str, MY_FUNC_SIG).c_str());
 	}
@@ -513,6 +521,55 @@ template<>
 inline mini::csv::ifstream& operator >> (mini::csv::ifstream& istm, mini::csv::sep& val)
 {
 	istm.set_delimiter(val.get_delimiter(), val.get_escape());
+
+	return istm;
+}
+
+inline mini::csv::ifstream& operator >> (mini::csv::ifstream& istm, mini::csv::NChar val)
+{
+	const std::string& str = istm.get_delimited_str();
+
+	int n = 0;
+#ifdef USE_BOOST_LEXICAL_CAST
+	try
+	{
+		n = boost::lexical_cast<int>(str);
+	}
+	catch (boost::bad_lexical_cast& e)
+	{
+		throw std::runtime_error(istm.error_line(str, MY_FUNC_SIG).c_str());
+	}
+#else
+	std::istringstream is(str);
+	is >> n;
+	if (!(bool)is)
+	{
+		throw std::runtime_error(istm.error_line(str, MY_FUNC_SIG).c_str());
+	}
+#endif
+
+	if (n > 127 || n < -128)
+	{
+		throw std::runtime_error(istm.error_line(str, MY_FUNC_SIG).c_str());
+	}
+
+	char temp = static_cast<char>(n);
+	val.setChar(temp);
+
+	return istm;
+}
+
+template<>
+inline mini::csv::ifstream& operator >> (mini::csv::ifstream& istm, char& val)
+{
+	const std::string& src = istm.get_delimited_str();
+
+	if (src.empty())
+	{
+		throw std::runtime_error(istm.error_line(src, MY_FUNC_SIG).c_str());
+	}
+
+	val = src[0];
 
 	return istm;
 }
@@ -584,15 +641,35 @@ inline mini::csv::ofstream& operator << (mini::csv::ofstream& ostm, const char& 
 	}
 	else
 	{
-		std::ostringstream os_temp;
+		if (!ostm.get_after_newline())
+			ostm.get_ofstream() << ostm.get_delimiter();
 
-		os_temp << val;
+		std::string temp = "";
+		temp += val;
+		ostm.escape_str_and_output(temp);
 
-		ostm.escape_and_output(os_temp.str());
+		ostm.set_after_newline(false);
 	}
 
 	return ostm;
 }
+
+inline mini::csv::ofstream& operator << (mini::csv::ofstream& ostm, mini::csv::NChar val)
+{
+	if (!ostm.get_after_newline())
+		ostm.get_ofstream() << ostm.get_delimiter();
+
+	std::ostringstream os_temp;
+
+	os_temp << static_cast<int>(val.getChar());
+
+	ostm.escape_and_output(os_temp.str());
+
+	ostm.set_after_newline(false);
+
+	return ostm;
+}
+
 template<>
 inline mini::csv::ofstream& operator << (mini::csv::ofstream& ostm, const char* val)
 {
@@ -690,7 +767,7 @@ namespace mini
 					}
 
 					ch = this->str[pos];
-					if (trim_quote_on_str)
+					//if (trim_quote_on_str)
 					{
 						if (within_quote&& ch == trim_quote && this->str[pos + 1] == trim_quote)
 						{
@@ -723,7 +800,7 @@ namespace mini
 			std::string unescape(std::string & src)
 			{
 				src = unescape_str.empty() ? src : replace(src, unescape_str, delimiter);
-				if (trim_quote_on_str)
+				//if (trim_quote_on_str)
 				{
 					if (!src.empty() && (src[0] == trim_quote && src[src.size() - 1] == trim_quote))
 					{
@@ -744,7 +821,7 @@ namespace mini
 					return 0;
 
 				size_t cnt = 0;
-				if (trim_quote_on_str)
+				//if (trim_quote_on_str)
 				{
 					bool inside_quote = false;
 					for (size_t i = 0; i < str.size(); ++i)
@@ -758,10 +835,6 @@ namespace mini
 								++cnt;
 						}
 					}
-				}
-				else
-				{
-					cnt = std::count(str.begin(), str.end(), delimiter[0]);
 				}
 				return cnt;
 			}
@@ -861,7 +934,7 @@ namespace mini
 			void escape_str_and_output(std::string src)
 			{
 				src = ((escape_str.empty()) ? src : replace(src, delimiter, escape_str));
-				if (surround_quote_on_str)
+				if (surround_quote_on_str || src.find(delimiter) != std::string::npos)
 				{
 					if (!quote_escape.empty())
 					{
@@ -899,7 +972,7 @@ mini::csv::istringstream& operator >> (mini::csv::istringstream& istm, T& val)
 	{
 		val = boost::lexical_cast<T>(str);
 	}
-	catch (boost::bad_lexical_cast&)
+	catch (boost::bad_lexical_cast& e)
 	{
 		throw std::runtime_error(istm.error_line(str, MY_FUNC_SIG).c_str());
 	}
@@ -926,6 +999,55 @@ template<>
 inline mini::csv::istringstream& operator >> (mini::csv::istringstream& istm, mini::csv::sep& val)
 {
 	istm.set_delimiter(val.get_delimiter(), val.get_escape());
+
+	return istm;
+}
+
+inline mini::csv::istringstream& operator >> (mini::csv::istringstream& istm, mini::csv::NChar val)
+{
+	const std::string& str = istm.get_delimited_str();
+
+	int n = 0;
+#ifdef USE_BOOST_LEXICAL_CAST
+	try
+	{
+		n = boost::lexical_cast<int>(str);
+	}
+	catch (boost::bad_lexical_cast& e)
+	{
+		throw std::runtime_error(istm.error_line(str, MY_FUNC_SIG).c_str());
+	}
+#else
+	std::istringstream is(str);
+	is >> n;
+	if (!(bool)is)
+	{
+		throw std::runtime_error(istm.error_line(str, MY_FUNC_SIG).c_str());
+	}
+#endif
+
+	if (n > 127 || n < -128)
+	{
+		throw std::runtime_error(istm.error_line(str, MY_FUNC_SIG).c_str());
+	}
+
+	char temp = static_cast<char>(n);
+	val.setChar(temp);
+
+	return istm;
+}
+
+template<>
+inline mini::csv::istringstream& operator >> (mini::csv::istringstream& istm, char& val)
+{
+	const std::string& src = istm.get_delimited_str();
+
+	if (src.empty())
+	{
+		throw std::runtime_error(istm.error_line(src, MY_FUNC_SIG).c_str());
+	}
+
+	val = src[0];
 
 	return istm;
 }
@@ -994,15 +1116,35 @@ inline mini::csv::ostringstream& operator << (mini::csv::ostringstream& ostm, co
 	}
 	else
 	{
-		std::ostringstream os_temp;
+		if (!ostm.get_after_newline())
+			ostm.get_ostringstream() << ostm.get_delimiter();
 
-		os_temp << val;
+		std::string temp = "";
+		temp += val;
+		ostm.escape_str_and_output(temp);
 
-		ostm.escape_and_output(os_temp.str());
+		ostm.set_after_newline(false);
 	}
 
 	return ostm;
 }
+
+inline mini::csv::ostringstream& operator << (mini::csv::ostringstream& ostm, mini::csv::NChar val)
+{
+	if (!ostm.get_after_newline())
+		ostm.get_ostringstream() << ostm.get_delimiter();
+
+	std::ostringstream os_temp;
+
+	os_temp << static_cast<int>(val.getChar());
+
+	ostm.escape_and_output(os_temp.str());
+
+	ostm.set_after_newline(false);
+
+	return ostm;
+}
+
 template<>
 inline mini::csv::ostringstream& operator << (mini::csv::ostringstream& ostm, const char* val)
 {
