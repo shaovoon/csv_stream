@@ -32,12 +32,12 @@ class timer
 {
 public:
 	timer() = default;
-	void start_timing(const std::string& text_)
+	void start(const std::string& text_)
 	{
 		text = text_;
 		begin = std::chrono::high_resolution_clock::now();
 	}
-	void stop_timing()
+	void stop()
 	{
 		auto end = std::chrono::high_resolution_clock::now();
 		auto dur = end - begin;
@@ -87,7 +87,7 @@ int main(int argc, char *argv[])
 
 		if (os.is_open())
 		{
-			stopwatch.start_timing("mini::csv::ofstream");
+			stopwatch.start("mini::csv::ofstream");
 			for (size_t k = 0; k < MAX_LOOP; ++k)
 			{
 				for (size_t i = 0; i < vec.size(); ++i)
@@ -97,7 +97,7 @@ int main(int argc, char *argv[])
 					do_not_optimize_away(result.c_str());
 				}
 			}
-			stopwatch.stop_timing();
+			stopwatch.stop();
 		}
 		os.flush();
 		os.close();
@@ -109,7 +109,7 @@ int main(int argc, char *argv[])
 		if (is.is_open())
 		{
 			Product product;
-			stopwatch.start_timing("mini::csv::ifstream");
+			stopwatch.start("mini::csv::ifstream");
 			while (is.read_line())
 			{
 				try
@@ -121,7 +121,7 @@ int main(int argc, char *argv[])
 					fprintf(stderr, "%s\n", e.what());
 				}
 			}
-			stopwatch.stop_timing();
+			stopwatch.stop();
 		}
 	}
 	{
@@ -133,7 +133,7 @@ int main(int argc, char *argv[])
 
 		if (os.is_open())
 		{
-			stopwatch.start_timing("capi::csv::ofstream");
+			stopwatch.start("capi::csv::ofstream");
 			for (size_t k = 0; k < MAX_LOOP; ++k)
 			{
 				for (size_t i = 0; i < vec.size(); ++i)
@@ -143,7 +143,7 @@ int main(int argc, char *argv[])
 					do_not_optimize_away(result.c_str());
 				}
 			}
-			stopwatch.stop_timing();
+			stopwatch.stop();
 		}
 		os.flush();
 		os.close();
@@ -155,7 +155,7 @@ int main(int argc, char *argv[])
 		if (is.is_open())
 		{
 			Product product;
-			stopwatch.start_timing("capi::csv::ifstream");
+			stopwatch.start("capi::csv::ifstream");
 			while (is.read_line())
 			{
 				try
@@ -168,7 +168,7 @@ int main(int argc, char *argv[])
 					break;
 				}
 			}
-			stopwatch.stop_timing();
+			stopwatch.stop();
 		}
 		is.close();
 	}
@@ -179,7 +179,7 @@ int main(int argc, char *argv[])
 		os.set_delimiter(',', "$$");
 		os.enable_surround_quote_on_str(true, '\"');
 
-		stopwatch.start_timing("capi::csv::omemoryfstream");
+		stopwatch.start("capi::csv::omemoryfstream");
 		for (size_t k = 0; k < MAX_LOOP; ++k)
 		{
 			for (size_t i = 0; i < vec.size(); ++i)
@@ -190,14 +190,14 @@ int main(int argc, char *argv[])
 			}
 		}
 		os.write_to_file(capi_file2.c_str());
-		stopwatch.stop_timing();
+		stopwatch.stop();
 
 		csv::icachedfstream ifs(capi_file2.c_str());
 		ifs.set_delimiter(',', "$$");
 		ifs.enable_trim_quote_on_str(true, '\"');
 
 		Product product;
-		stopwatch.start_timing("capi::csv::imemoryfstream");
+		stopwatch.start("capi::csv::imemoryfstream");
 		while (ifs.read_line())
 		{
 			try
@@ -210,7 +210,7 @@ int main(int argc, char *argv[])
 				break;
 			}
 		}
-		stopwatch.stop_timing();
+		stopwatch.stop();
 	}
 	// string stream benchmark
 	//=========================
@@ -221,7 +221,7 @@ int main(int argc, char *argv[])
 		os.set_delimiter(',', "$$");
 		os.enable_surround_quote_on_str(true, '\"');
 
-		stopwatch.start_timing("mini::csv::ostringstream");
+		stopwatch.start("mini::csv::ostringstream");
 		for (size_t k = 0; k < MAX_LOOP; ++k)
 		{
 			for (size_t i = 0; i < vec.size(); ++i)
@@ -231,14 +231,14 @@ int main(int argc, char *argv[])
 				do_not_optimize_away(result.c_str());
 			}
 		}
-		stopwatch.stop_timing();
+		stopwatch.stop();
 
 		csv::istringstream is(os.get_text().c_str());
 		is.set_delimiter(',', "$$");
 		is.enable_trim_quote_on_str(true, '\"');
 
 		Product product;
-		stopwatch.start_timing("mini::csv::istringstream");
+		stopwatch.start("mini::csv::istringstream");
 		while (is.read_line())
 		{
 			try
@@ -250,7 +250,7 @@ int main(int argc, char *argv[])
 				fprintf(stderr, "%s\n", e.what());
 			}
 		}
-		stopwatch.stop_timing();
+		stopwatch.stop();
 	}
 	{
 		using namespace capi;
@@ -259,7 +259,7 @@ int main(int argc, char *argv[])
 		os.set_delimiter(',', "$$");
 		os.enable_surround_quote_on_str(true, '\"');
 
-		stopwatch.start_timing("capi::csv::ostringstream");
+		stopwatch.start("capi::csv::ostringstream");
 		for (size_t k = 0; k < MAX_LOOP; ++k)
 		{
 			for (size_t i = 0; i < vec.size(); ++i)
@@ -269,14 +269,14 @@ int main(int argc, char *argv[])
 				do_not_optimize_away(result.c_str());
 			}
 		}
-		stopwatch.stop_timing();
+		stopwatch.stop();
 
 		csv::istringstream is(os.get_text().c_str());
 		is.set_delimiter(',', "$$");
 		is.enable_trim_quote_on_str(true, '\"');
 
 		Product product;
-		stopwatch.start_timing("capi::csv::istringstream");
+		stopwatch.start("capi::csv::istringstream");
 		while (is.read_line())
 		{
 			try
@@ -288,7 +288,7 @@ int main(int argc, char *argv[])
 				fprintf(stderr, "%s\n", e.what());
 			}
 		}
-		stopwatch.stop_timing();
+		stopwatch.stop();
 	}
 
 	return 0;
