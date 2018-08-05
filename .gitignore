@@ -50,3 +50,5 @@ README.txt
 *.db-wal
 *.db-shm
 *.ipch
+
+.vs/

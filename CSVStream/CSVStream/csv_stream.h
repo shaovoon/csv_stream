@@ -9,6 +9,7 @@
 // version 0.5.2  : Add NChar class and its unit tests. Remove CHAR_AS_ASCII macro.
 // version 0.5.3  : Can have an unescaped delimiter which will be enclosed by quote automatically
 // version 0.5.3b : Update minicsv.h in Benchmark to 1.8.5
+// version 0.5.4  : Add overloaded open functions that take in wchar file parameter (Only available on win32)
 
 #ifndef CSV_STREAMS_H
 	#define CSV_STREAMS_H
@@ -400,6 +401,27 @@ namespace capi
 			{
 				open(file);
 			}
+#ifdef _MSC_VER
+			ifstream(const std::wstring& file = L"")
+				: input_file_ptr(nullptr)
+				, str("")
+				, pos(0)
+				, delimiter(",")
+				, unescape_str("##")
+				, trim_quote_on_str(false)
+				, trim_quote('\"')
+				, trim_quote_str(1, trim_quote)
+				, terminate_on_blank_line(true)
+				, quote_unescape("&quot;")
+				, has_bom(false)
+				, first_line_read(false)
+				, filename("")
+				, line_num(0)
+				, token_num(0)
+			{
+				open(file);
+			}
+#endif
 			ifstream(const char * file)
 				: input_file_ptr(nullptr)
 				, str("")
@@ -419,6 +441,27 @@ namespace capi
 			{
 				open(file);
 			}
+#ifdef _MSC_VER
+			ifstream(const wchar_t * file)
+				: input_file_ptr(nullptr)
+				, str("")
+				, pos(0)
+				, delimiter(",")
+				, unescape_str("##")
+				, trim_quote_on_str(false)
+				, trim_quote('\"')
+				, trim_quote_str(1, trim_quote)
+				, terminate_on_blank_line(true)
+				, quote_unescape("&quot;")
+				, has_bom(false)
+				, first_line_read(false)
+				, filename("")
+				, line_num(0)
+				, token_num(0)
+			{
+				open(file);
+			}
+#endif
 			~ifstream()
 			{
 				close();
@@ -428,6 +471,13 @@ namespace capi
 				if (!file.empty())
 					open(file.c_str());
 			}
+#ifdef _MSC_VER
+			void open(const std::wstring& file)
+			{
+				if (!file.empty())
+					open(file.c_str());
+			}
+#endif
 			bool open(const char * file)
 			{
 				close();
@@ -446,6 +496,21 @@ namespace capi
 
 				return true;
 			}
+#ifdef _MSC_VER
+			bool open(const wchar_t * file)
+			{
+				close();
+				reset();
+
+				_wfopen_s(&input_file_ptr, file, L"rb");
+				if (!input_file_ptr)
+					return false;
+
+				read_bom();
+
+				return true;
+			}
+#endif
 			void read_bom()
 			{
 				char tt[3] = { 0, 0, 0 };
@@ -717,6 +782,19 @@ namespace capi
 			{
 				open(file);
 			}
+#ifdef _MSC_VER
+			ofstream(const std::wstring& file = L"")
+				: output_file_ptr(nullptr)
+				, after_newline(true)
+				, delimiter(",")
+				, escape_str("##")
+				, surround_quote_on_str(false)
+				, surround_quote('\"')
+				, quote_escape("&quot;")
+			{
+				open(file);
+			}
+#endif
 			~ofstream()
 			{
 				close();
@@ -732,11 +810,31 @@ namespace capi
 			{
 				open(file);
 			}
+#ifdef _MSC_VER
+			ofstream(const wchar_t * file)
+				: output_file_ptr(nullptr)
+				, after_newline(true)
+				, delimiter(",")
+				, escape_str("##")
+				, surround_quote_on_str(false)
+				, surround_quote('\"')
+				, quote_escape("&quot;")
+			{
+				open(file);
+			}
+#endif
 			void open(const std::string& file)
 			{
 				if (!file.empty())
 					open(file.c_str());
 			}
+#ifdef _MSC_VER
+			void open(const std::wstring& file)
+			{
+				if (!file.empty())
+					open(file.c_str());
+			}
+#endif
 			void open(const char * file)
 			{
 				close();
@@ -747,6 +845,14 @@ namespace capi
 				output_file_ptr = fopen(file, "wb");
 #endif
 			}
+#ifdef _MSC_VER
+			void open(const wchar_t * file)
+			{
+				close();
+				reset();
+				_wfopen_s(&output_file_ptr, file, L"wb");
+			}
+#endif
 			void reset()
 			{
 				after_newline = true;
@@ -1252,6 +1358,25 @@ namespace capi
 			{
 				open(file);
 			}
+#ifdef _MSC_VER
+			icachedfstream(const std::wstring& file = L"")
+				: input_str("")
+				, input_str_index(0)
+				, str("")
+				, pos(0)
+				, delimiter(",")
+				, unescape_str("##")
+				, trim_quote_on_str(false)
+				, trim_quote('\"')
+				, trim_quote_str(1, trim_quote)
+				, terminate_on_blank_line(true)
+				, quote_unescape("&quot;")
+				, line_num(0)
+				, token_num(0)
+			{
+				open(file);
+			}
+#endif
 			icachedfstream(const char * file)
 				: input_str("")
 				, input_str_index(0)
@@ -1269,6 +1394,25 @@ namespace capi
 			{
 				open(file);
 			}
+#ifdef _MSC_VER
+			icachedfstream(const wchar_t * file)
+				: input_str("")
+				, input_str_index(0)
+				, str("")
+				, pos(0)
+				, delimiter(",")
+				, unescape_str("##")
+				, trim_quote_on_str(false)
+				, trim_quote('\"')
+				, trim_quote_str(1, trim_quote)
+				, terminate_on_blank_line(true)
+				, quote_unescape("&quot;")
+				, line_num(0)
+				, token_num(0)
+			{
+				open(file);
+			}
+#endif
 			void reset()
 			{
 				input_str = "";
@@ -1290,6 +1434,13 @@ namespace capi
 				if (!file.empty())
 					open(file.c_str());
 			}
+#ifdef _MSC_VER
+			void open(const std::wstring& file)
+			{
+				if (!file.empty())
+					open(file.c_str());
+			}
+#endif
 			bool open(const char * file)
 			{
 				reset();
@@ -1312,7 +1463,26 @@ namespace capi
 
 				return true;
 			}
+#ifdef _MSC_VER
+			bool open(const wchar_t * file)
+			{
+				reset();
+				FILE* input_file_ptr = nullptr;
+				_wfopen_s(&input_file_ptr, file, L"rb");
+				if (!input_file_ptr)
+					return false;
 
+				long size = compute_length(input_file_ptr);
+
+				input_str.resize(size);
+				char* p = const_cast<char*>(input_str.c_str());
+				std::fread(p, size, 1, input_file_ptr);
+
+				fclose(input_file_ptr);
+
+				return true;
+			}
+#endif
 			void enable_trim_quote_on_str(bool enable, char quote, const std::string& unescape = "&quot;")
 			{
 				trim_quote_on_str = enable;
@@ -1707,6 +1877,21 @@ namespace capi
 #else
 				FILE* fp = fopen(file, "wb");
 #endif
+				if (fp)
+				{
+					size_t size = std::fwrite(output_str.c_str(), output_str.size(), 1, fp);
+					std::fflush(fp);
+					std::fclose(fp);
+					output_str.clear();
+					after_newline = true;
+					return size == 1u;
+				}
+				return false;
+			}
+			bool write_to_file(const wchar_t* file)
+			{
+				FILE* fp = nullptr;
+				_wfopen_s(&fp, file, L"wb");
 				if (fp)
 				{
 					size_t size = std::fwrite(output_str.c_str(), output_str.size(), 1, fp);
