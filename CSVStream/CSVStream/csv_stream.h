@@ -10,6 +10,7 @@
 // version 0.5.3  : Can have an unescaped delimiter which will be enclosed by quote automatically
 // version 0.5.3b : Update minicsv.h in Benchmark to 1.8.5
 // version 0.5.4  : Add overloaded open functions that take in wchar file parameter (Only available on win32)
+// version 0.5.4b : Fix GCC and Clang error
 
 #ifndef CSV_STREAMS_H
 	#define CSV_STREAMS_H
@@ -1914,6 +1915,7 @@ namespace capi
 				}
 				return false;
 			}
+#ifdef _MSC_VER
 			bool write_to_file(const wchar_t* file)
 			{
 				FILE* fp = nullptr;
@@ -1929,6 +1931,7 @@ namespace capi
 				}
 				return false;
 			}
+#endif
 
 		private:
 			std::string output_str;
