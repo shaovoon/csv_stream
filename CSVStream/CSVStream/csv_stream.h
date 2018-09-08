@@ -11,6 +11,7 @@
 // version 0.5.3b : Update minicsv.h in Benchmark to 1.8.5
 // version 0.5.4  : Add overloaded open functions that take in wchar file parameter (Only available on win32)
 // version 0.5.4b : Fix GCC and Clang error
+// version 0.5.4c : Fix min/max clash with windows header
 
 #ifndef CSV_STREAMS_H
 	#define CSV_STREAMS_H
@@ -250,9 +251,9 @@ namespace capi
 			try
 			{
 				int n = std::stoi(src);
-				if (n > std::numeric_limits<short>::max())
+				if (n > (std::numeric_limits<short>::max)())
 					return false;
-				if (n < std::numeric_limits<short>::min())
+				if (n < (std::numeric_limits<short>::min)())
 					return false;
 
 				dest = static_cast<short>(n);
@@ -274,7 +275,7 @@ namespace capi
 			try
 			{
 				unsigned int n = std::stoul(src);
-				if (n > std::numeric_limits<unsigned short>::max())
+				if (n > (std::numeric_limits<unsigned short>::max)())
 					return false;
 
 				dest = static_cast<unsigned short>(n);
