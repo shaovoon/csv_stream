@@ -12,6 +12,7 @@
 // version 0.5.4  : Add overloaded open functions that take in wchar file parameter (Only available on win32)
 // version 0.5.4b : Fix GCC and Clang error
 // version 0.5.4c : Fix min/max clash with windows header
+// version 0.5.4d : Change from _WIN32 to _MSC_VER for the macro check for MY_FUNC_SIG
 
 #ifndef CSV_STREAMS_H
 	#define CSV_STREAMS_H
@@ -31,7 +32,7 @@
 
 #define NEWLINE '\n'
 
-#ifdef _WIN32
+#ifdef _MSC_VER
 #define MY_FUNC_SIG __FUNCSIG__
 #else
 #define MY_FUNC_SIG __PRETTY_FUNCTION__

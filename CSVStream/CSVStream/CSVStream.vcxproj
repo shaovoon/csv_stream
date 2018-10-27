@@ -28,7 +28,7 @@
     <ProjectGuid>{02629276-F34F-441E-9B7A-33A7E15B7B9C}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>CSVStream</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.14393.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
