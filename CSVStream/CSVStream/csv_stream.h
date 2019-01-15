@@ -1,6 +1,6 @@
 // The MIT License (MIT)
-// capi Fast CSV Streams 0.5.0 Beta
-// Copyright (C) 2017, by Wong Shao Voon (shaovoon@yahoo.com)
+// capi Fast CSV Streams 0.5.4d Beta
+// Copyright (C) 2017 - 2019, by Wong Shao Voon (shaovoon@yahoo.com)
 //
 // http://opensource.org/licenses/MIT
 //
