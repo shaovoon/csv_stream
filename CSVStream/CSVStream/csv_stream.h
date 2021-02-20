@@ -1,6 +1,6 @@
 // The MIT License (MIT)
-// capi Fast CSV Streams 0.5.4d Beta
-// Copyright (C) 2017 - 2019, by Wong Shao Voon (shaovoon@yahoo.com)
+// capi Fast CSV Streams 0.5.4e Beta
+// Copyright (C) 2017 - 2021, by Wong Shao Voon (shaovoon@yahoo.com)
 //
 // http://opensource.org/licenses/MIT
 //
@@ -13,6 +13,7 @@
 // version 0.5.4b : Fix GCC and Clang error
 // version 0.5.4c : Fix min/max clash with windows header
 // version 0.5.4d : Change from _WIN32 to _MSC_VER for the macro check for MY_FUNC_SIG
+// version 0.5.4e : Fix the infinite loop in unescape()
 
 #ifndef CSV_STREAMS_H
 	#define CSV_STREAMS_H
@@ -702,7 +703,7 @@ namespace capi
 						src = src.substr(1, src.size() - 2);
 					}
 
-					if (std::string::npos != src.find(quote_unescape, 0))
+					if (!quote_unescape.empty() && std::string::npos != src.find(quote_unescape, 0))
 					{
 						src = replace(src, quote_unescape, trim_quote_str);
 					}
@@ -1281,7 +1282,7 @@ namespace capi
 						src = src.substr(1, src.size() - 2);
 					}
 
-					if (std::string::npos != src.find(quote_unescape, 0))
+					if (!quote_unescape.empty() && std::string::npos != src.find(quote_unescape, 0))
 					{
 						src = replace(src, quote_unescape, trim_quote_str);
 					}
@@ -1629,7 +1630,7 @@ namespace capi
 						src = src.substr(1, src.size() - 2);
 					}
 
-					if (std::string::npos != src.find(quote_unescape, 0))
+					if (!quote_unescape.empty() && std::string::npos != src.find(quote_unescape, 0))
 					{
 						src = replace(src, quote_unescape, trim_quote_str);
 					}
