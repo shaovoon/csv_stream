@@ -45,6 +45,7 @@ int main()
 	test_file("test_file4.txt", "Fruits", 400, false, ',', "$$");
 	test_file("test_file5.txt", "", 500, false, ',', "$$");
 	test_file("test_file6.txt", "Hello,World", 600, false, ',', "");
+	test_file("test_file7.txt", "Fruits\nWorld", 700, true, ',', "$$");
 
 	test_memfile("test_memfile1.txt", "Fruits", 100, true);
 	test_memfile("test_memfile2.txt", "", 200, true);
