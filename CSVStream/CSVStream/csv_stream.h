@@ -1,5 +1,5 @@
 // The MIT License (MIT)
-// capi Fast CSV Streams 0.5.5 Beta
+// capi Fast CSV Streams 0.5.5b Beta
 // Copyright (C) 2017 - 2021, by Wong Shao Voon (shaovoon@yahoo.com)
 //
 // http://opensource.org/licenses/MIT
@@ -16,6 +16,8 @@
 // version 0.5.4e : Fix the infinite loop in unescape()
 // version 0.5.4f : Put common functions in the base class, hereby reducing 448 LOC
 // version 0.5.5  : Escape newlines when detected in the string input.
+// version 0.5.5b : Set visibility of some methods of istream_base from protected to public
+
 #ifndef CSV_STREAMS_H
 	#define CSV_STREAMS_H
 
@@ -487,8 +489,6 @@ namespace capi
 
 				return error;
 			}
-
-		protected:
 			void enable_blank_line(bool enable)
 			{
 				allow_blank_line = enable;
@@ -496,28 +496,6 @@ namespace capi
 			std::string const& get_unescape_str() const
 			{
 				return unescape_str;
-			}
-			std::string& unescape(std::string& src)
-			{
-				src = unescape_str.empty() ? src : replace(src, unescape_str, delimiter);
-				//if (trim_quote_on_str)
-				{
-					if (!src.empty() && (src[0] == trim_quote && src[src.size() - 1] == trim_quote))
-					{
-						src = src.substr(1, src.size() - 2);
-					}
-
-					if (!newline_unescape.empty() && std::string::npos != src.find(newline_unescape, 0))
-					{
-						src = replace(src, newline_unescape, "\n");
-					}
-
-					if (!quote_unescape.empty() && std::string::npos != src.find(quote_unescape, 0))
-					{
-						src = replace(src, quote_unescape, trim_quote_str);
-					}
-				}
-				return src;
 			}
 			size_t num_of_delimiter() const
 			{
@@ -553,6 +531,30 @@ namespace capi
 			bool is_terminate_on_blank_line() const
 			{
 				return terminate_on_blank_line;
+			}
+
+		protected:
+			std::string& unescape(std::string& src)
+			{
+				src = unescape_str.empty() ? src : replace(src, unescape_str, delimiter);
+				//if (trim_quote_on_str)
+				{
+					if (!src.empty() && (src[0] == trim_quote && src[src.size() - 1] == trim_quote))
+					{
+						src = src.substr(1, src.size() - 2);
+					}
+
+					if (!newline_unescape.empty() && std::string::npos != src.find(newline_unescape, 0))
+					{
+						src = replace(src, newline_unescape, "\n");
+					}
+
+					if (!quote_unescape.empty() && std::string::npos != src.find(quote_unescape, 0))
+					{
+						src = replace(src, quote_unescape, trim_quote_str);
+					}
+				}
+				return src;
 			}
 
 		protected:

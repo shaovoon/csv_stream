@@ -1,11 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31515.178
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CSVStream", "CSVStream\CSVStream.vcxproj", "{02629276-F34F-441E-9B7A-33A7E15B7B9C}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Benchmark", "Benchmark\Benchmark.vcxproj", "{15E5E0A9-3F9F-491F-B014-C21D68D7AB4B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,16 +21,11 @@ Global
 		{02629276-F34F-441E-9B7A-33A7E15B7B9C}.Release|x64.Build.0 = Release|x64
 		{02629276-F34F-441E-9B7A-33A7E15B7B9C}.Release|x86.ActiveCfg = Release|Win32
 		{02629276-F34F-441E-9B7A-33A7E15B7B9C}.Release|x86.Build.0 = Release|Win32
-		{15E5E0A9-3F9F-491F-B014-C21D68D7AB4B}.Debug|x64.ActiveCfg = Debug|x64
-		{15E5E0A9-3F9F-491F-B014-C21D68D7AB4B}.Debug|x64.Build.0 = Debug|x64
-		{15E5E0A9-3F9F-491F-B014-C21D68D7AB4B}.Debug|x86.ActiveCfg = Debug|Win32
-		{15E5E0A9-3F9F-491F-B014-C21D68D7AB4B}.Debug|x86.Build.0 = Debug|Win32
-		{15E5E0A9-3F9F-491F-B014-C21D68D7AB4B}.Release|x64.ActiveCfg = Release|x64
-		{15E5E0A9-3F9F-491F-B014-C21D68D7AB4B}.Release|x64.Build.0 = Release|x64
-		{15E5E0A9-3F9F-491F-B014-C21D68D7AB4B}.Release|x86.ActiveCfg = Release|Win32
-		{15E5E0A9-3F9F-491F-B014-C21D68D7AB4B}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {74BE9027-DFB6-4427-BA65-E33F88DA55C6}
 	EndGlobalSection
 EndGlobal
